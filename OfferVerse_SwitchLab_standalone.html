@@ -1,0 +1,1648 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="description" content="OfferVerse SwitchLab is a private, installable job switch salary estimator for base pay, sign-on bonuses, RSUs, relocation repayment, taxes, and what-if salary scenarios." />
+  <title>OfferVerse SwitchLab · Standalone</title>
+  <style>
+:root {
+  --bg: #eef3ff;
+  --surface: rgba(255, 255, 255, 0.86);
+  --surface-solid: #ffffff;
+  --text: #0f172a;
+  --muted: #667085;
+  --muted-2: #94a3b8;
+  --primary: #4f46e5;
+  --primary-2: #7c3aed;
+  --primary-soft: #e7e5ff;
+  --success: #047857;
+  --success-bg: #d1fae5;
+  --danger: #be123c;
+  --danger-bg: #ffe4e6;
+  --warning: #b45309;
+  --warning-bg: #fef3c7;
+  --line: #d8e0ef;
+  --shadow: 0 24px 70px rgba(15, 23, 42, 0.13);
+  --shadow-soft: 0 12px 32px rgba(15, 23, 42, 0.08);
+  --radius-xl: 32px;
+  --radius-lg: 24px;
+  --radius-md: 18px;
+  --radius-sm: 12px;
+  --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+:root.dark {
+  --bg: #08111f;
+  --surface: rgba(15, 23, 42, 0.88);
+  --surface-solid: #111c2f;
+  --text: #e5edff;
+  --muted: #9aa8bd;
+  --muted-2: #64748b;
+  --primary: #818cf8;
+  --primary-2: #c084fc;
+  --primary-soft: rgba(129, 140, 248, 0.18);
+  --success: #34d399;
+  --success-bg: rgba(52, 211, 153, 0.13);
+  --danger: #fb7185;
+  --danger-bg: rgba(251, 113, 133, 0.13);
+  --warning: #fbbf24;
+  --warning-bg: rgba(251, 191, 36, 0.13);
+  --line: rgba(148, 163, 184, 0.24);
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.45);
+  --shadow-soft: 0 12px 32px rgba(0, 0, 0, 0.24);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  color: var(--text);
+  background:
+    radial-gradient(circle at top left, rgba(79, 70, 229, 0.22), transparent 34rem),
+    radial-gradient(circle at top right, rgba(14, 165, 233, 0.18), transparent 34rem),
+    var(--bg);
+  min-height: 100vh;
+}
+
+button, input, textarea { font: inherit; }
+button { cursor: pointer; }
+
+.app-shell {
+  width: min(1220px, calc(100% - 28px));
+  margin: 0 auto;
+  padding: 18px 0 48px;
+}
+
+.top-app-bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  backdrop-filter: blur(18px);
+}
+
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-mark {
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  color: white;
+  background: linear-gradient(145deg, var(--primary), var(--primary-2));
+  box-shadow: var(--shadow-soft);
+}
+
+.brand-mark svg { width: 35px; height: 35px; }
+.brand-mark path:first-child { fill: currentColor; opacity: 0.18; }
+.brand-mark path:last-child { fill: none; stroke: currentColor; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+
+h1, h2, h3, p { margin: 0; }
+
+h1 { font-size: clamp(1.1rem, 2vw, 1.35rem); letter-spacing: -0.04em; }
+h2 { font-size: clamp(1.55rem, 4vw, 2.55rem); line-height: 1.05; letter-spacing: -0.055em; }
+h3 { font-size: 1.08rem; letter-spacing: -0.025em; }
+
+.eyebrow {
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.72rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.top-actions, .button-row { display: flex; align-items: center; gap: 10px; }
+.button-row.compact { gap: 8px; }
+
+.icon-button,
+.pill-button {
+  border: 0;
+  border-radius: 999px;
+  min-height: 42px;
+  padding: 0 18px;
+  color: white;
+  background: linear-gradient(145deg, var(--primary), var(--primary-2));
+  font-weight: 800;
+  box-shadow: var(--shadow-soft);
+}
+
+.icon-button {
+  width: 42px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  font-size: 1.2rem;
+}
+
+.pill-button.subtle,
+.icon-button.subtle {
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: none;
+}
+
+.hidden { display: none !important; }
+
+.elevated {
+  background: var(--surface);
+  border: 1px solid rgba(255,255,255,0.55);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(22px);
+}
+
+.hero-card {
+  border-radius: var(--radius-xl);
+  padding: clamp(22px, 4vw, 40px);
+  display: grid;
+  grid-template-columns: 1.25fr 0.95fr;
+  gap: 24px;
+  overflow: hidden;
+  position: relative;
+}
+
+.hero-card::after {
+  content: "";
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border-radius: 999px;
+  right: -90px;
+  top: -140px;
+  background: linear-gradient(145deg, rgba(79,70,229,.16), rgba(124,58,237,.08));
+  pointer-events: none;
+}
+
+.hero-copy { position: relative; z-index: 1; }
+.hero-subtitle {
+  color: var(--muted);
+  margin-top: 14px;
+  line-height: 1.65;
+  max-width: 58rem;
+}
+
+.hero-metrics {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-content: center;
+}
+
+.metric-tile,
+.kpi-card {
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  background: rgba(255,255,255,.58);
+  border: 1px solid var(--line);
+}
+
+:root.dark .metric-tile,
+:root.dark .kpi-card { background: rgba(15,23,42,.56); }
+
+.metric-tile.primary { grid-column: span 2; background: linear-gradient(145deg, var(--primary), var(--primary-2)); color: white; border-color: transparent; }
+.metric-tile span, .kpi-card span { color: var(--muted); font-size: .84rem; font-weight: 700; }
+.metric-tile.primary span { color: rgba(255,255,255,.78); }
+.metric-tile strong, .kpi-card strong { display: block; margin-top: 8px; font-size: clamp(1.35rem, 3vw, 2rem); letter-spacing: -0.05em; }
+.kpi-card small { display: block; color: var(--muted); margin-top: 6px; }
+
+.segmented-tabs {
+  margin: 22px 0;
+  padding: 8px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  position: sticky;
+  top: 82px;
+  z-index: 19;
+  backdrop-filter: blur(22px);
+}
+
+.tab {
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  min-height: 44px;
+  font-weight: 800;
+  transition: 0.18s ease;
+}
+
+.tab.active {
+  background: linear-gradient(145deg, var(--primary), var(--primary-2));
+  color: white;
+  box-shadow: var(--shadow-soft);
+}
+
+.panel { display: none; }
+.panel.active { display: block; animation: fadeIn .18s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+.section-heading,
+.card-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.card-heading { margin-bottom: 10px; align-items: flex-start; }
+.card-heading p, .section-heading p:not(.eyebrow) { color: var(--muted); margin-top: 4px; line-height: 1.5; }
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.kpi-card { background: var(--surface); }
+.kpi-card.good { border-color: rgba(4,120,87,.28); background: var(--success-bg); }
+.kpi-card.bad { border-color: rgba(190,18,60,.28); background: var(--danger-bg); }
+.kpi-card.good strong { color: var(--success); }
+.kpi-card.bad strong { color: var(--danger); }
+
+.dashboard-grid,
+.lab-grid,
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.chart-card,
+.table-card,
+.lab-card,
+.breakdown-card,
+.form-card,
+.report-card {
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+
+.chart-frame {
+  min-height: 310px;
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: linear-gradient(180deg, rgba(255,255,255,.38), rgba(255,255,255,.14));
+  border: 1px solid var(--line);
+}
+
+:root.dark .chart-frame { background: linear-gradient(180deg, rgba(30,41,59,.38), rgba(15,23,42,.14)); }
+
+.chart-frame svg { display: block; width: 100%; height: 100%; min-height: 310px; }
+.chart-label { fill: var(--muted); font-size: 12px; font-weight: 700; }
+.chart-title { fill: var(--text); font-size: 13px; font-weight: 800; }
+.grid-line { stroke: var(--line); stroke-width: 1; }
+.chart-axis { stroke: var(--line); stroke-width: 1.2; }
+.bar-positive { fill: url(#barGood); }
+.bar-negative { fill: url(#barBad); }
+.bar-stay { fill: url(#barStay); }
+.line-stay { stroke: var(--muted-2); }
+.line-switch { stroke: var(--primary); }
+.dot-stay { fill: var(--muted-2); }
+.dot-switch { fill: var(--primary); }
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  border-radius: 999px;
+  padding: 0 10px;
+  background: var(--success-bg);
+  color: var(--success);
+  font-weight: 900;
+  font-size: .76rem;
+  white-space: nowrap;
+}
+.status-chip.neutral { background: var(--primary-soft); color: var(--primary); }
+.status-chip.bad { background: var(--danger-bg); color: var(--danger); }
+
+.table-card { margin-top: 16px; }
+.table-wrap { overflow-x: auto; border-radius: var(--radius-md); border: 1px solid var(--line); }
+table { width: 100%; border-collapse: collapse; min-width: 720px; background: rgba(255,255,255,.28); }
+:root.dark table { background: rgba(15,23,42,.18); }
+th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; }
+td { font-weight: 750; }
+tr:last-child td { border-bottom: 0; }
+.delta-good { color: var(--success); }
+.delta-bad { color: var(--danger); }
+.decision-pill { border-radius: 999px; padding: 6px 10px; font-weight: 900; font-size: .78rem; display: inline-flex; }
+.decision-pill.good { background: var(--success-bg); color: var(--success); }
+.decision-pill.bad { background: var(--danger-bg); color: var(--danger); }
+.decision-pill.neutral { background: var(--warning-bg); color: var(--warning); }
+
+.lab-grid { grid-template-columns: 1.1fr .95fr .95fr; }
+.lab-card, .breakdown-card { min-height: 285px; }
+.range-label { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-weight: 800; color: var(--muted); }
+.range-label strong { font-size: clamp(1.5rem, 4vw, 2.2rem); color: var(--text); letter-spacing: -0.05em; }
+input[type="range"] { width: 100%; margin: 28px 0 10px; accent-color: var(--primary); }
+.range-scale { display: flex; justify-content: space-between; color: var(--muted); font-size: .8rem; font-weight: 800; }
+.offer-verdict { margin-top: 30px; padding: 18px; border-radius: var(--radius-md); background: var(--primary-soft); }
+.verdict-badge { display: inline-flex; border-radius: 999px; padding: 8px 12px; margin-bottom: 10px; background: var(--surface-solid); color: var(--primary); font-weight: 900; }
+.offer-verdict.good { background: var(--success-bg); }
+.offer-verdict.good .verdict-badge { color: var(--success); }
+.offer-verdict.bad { background: var(--danger-bg); }
+.offer-verdict.bad .verdict-badge { color: var(--danger); }
+.offer-verdict p { color: var(--muted); line-height: 1.55; }
+
+.breakdown-list { display: grid; gap: 10px; margin-top: 14px; }
+.breakdown-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.breakdown-row:last-child { border-bottom: 0; }
+.breakdown-row span { color: var(--muted); font-weight: 700; }
+.breakdown-row strong { letter-spacing: -0.02em; }
+.breakdown-row.total { padding-top: 16px; margin-top: 4px; border-top: 2px solid var(--line); border-bottom: 0; }
+.breakdown-row.total strong { font-size: 1.15rem; }
+
+.form-grid { grid-template-columns: 1fr; }
+.input-grid { display: grid; gap: 14px; margin-top: 14px; }
+.input-grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.input-grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+label, .full-label { display: grid; gap: 7px; color: var(--muted); font-weight: 800; font-size: .86rem; }
+input, textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  min-height: 46px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,.68);
+  color: var(--text);
+  outline: none;
+  transition: border .16s ease, box-shadow .16s ease, background .16s ease;
+}
+:root.dark input, :root.dark textarea { background: rgba(15,23,42,.68); }
+input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
+textarea { resize: vertical; line-height: 1.5; }
+.full-label { margin-top: 14px; }
+.helper { color: var(--muted); margin-top: 12px; line-height: 1.55; font-size: .88rem; }
+
+.report-output { color: var(--text); line-height: 1.75; }
+.report-output h3 { margin: 18px 0 8px; }
+.report-output h3:first-child { margin-top: 0; }
+.report-output ul { margin: 8px 0 0; padding-left: 20px; }
+.report-output code { background: var(--primary-soft); color: var(--primary); border-radius: 8px; padding: 2px 6px; font-weight: 800; }
+
+.app-footer { color: var(--muted); text-align: center; padding: 30px 0 0; font-size: .86rem; }
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%) translateY(120%);
+  min-width: min(420px, calc(100% - 32px));
+  background: #111827;
+  color: white;
+  border-radius: 999px;
+  padding: 13px 18px;
+  text-align: center;
+  font-weight: 800;
+  box-shadow: var(--shadow);
+  transition: transform .2s ease;
+  z-index: 100;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 940px) {
+  .hero-card, .dashboard-grid, .lab-grid { grid-template-columns: 1fr; }
+  .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .segmented-tabs { overflow-x: auto; grid-template-columns: repeat(5, minmax(110px, 1fr)); border-radius: 24px; top: 76px; }
+}
+
+@media (max-width: 680px) {
+  .app-shell { width: min(100% - 18px, 1220px); padding-bottom: 98px; }
+  .top-app-bar { align-items: flex-start; }
+  .brand-mark { width: 46px; height: 46px; border-radius: 16px; }
+  .top-actions .pill-button { display: none; }
+  .hero-metrics, .kpi-grid, .input-grid.two, .input-grid.three { grid-template-columns: 1fr; }
+  .metric-tile.primary { grid-column: auto; }
+  .section-heading, .card-heading { align-items: flex-start; flex-direction: column; }
+  .segmented-tabs {
+    position: fixed;
+    left: 9px;
+    right: 9px;
+    top: auto;
+    bottom: 10px;
+    z-index: 80;
+    border-radius: 28px;
+    box-shadow: var(--shadow);
+  }
+  .tab { min-width: 88px; min-height: 48px; font-size: .78rem; }
+  .chart-frame svg { min-width: 650px; }
+  .chart-frame { overflow-x: auto; }
+  .toast { bottom: 92px; }
+}
+
+@media print {
+  body { background: white; }
+  .top-app-bar, .segmented-tabs, .button-row, .pill-button, .icon-button, .app-footer { display: none !important; }
+  .app-shell { width: 100%; padding: 0; }
+  .panel { display: block !important; }
+  .elevated { box-shadow: none; border: 1px solid #ddd; background: white; break-inside: avoid; }
+  .hero-card { margin-bottom: 16px; }
+}
+
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="top-app-bar">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48" role="img">
+            <path d="M24 3 43 14v20L24 45 5 34V14L24 3Z"/>
+            <path d="M15 25.4 21.2 31 34 16"/>
+          </svg>
+        </div>
+        <div>
+          <p class="eyebrow">Job Switch Salary Estimator</p>
+          <h1>OfferVerse SwitchLab</h1>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button id="themeToggle" class="icon-button" type="button" aria-label="Toggle dark mode">
+          <span aria-hidden="true">◐</span>
+        </button>
+        <button id="installBtn" class="pill-button subtle hidden" type="button">Install</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero-card elevated">
+        <div class="hero-copy">
+          <p class="eyebrow">Private, local, editable</p>
+          <h2>Know the exact base salary that makes switching worth it.</h2>
+          <p class="hero-subtitle">Prefilled with your Amazon → Cap One example: sign-on, second-year bonus, RSUs, relocation repayment, Arizona/Virginia take-home rates, and salary scenarios through Nov 1, 2029.</p>
+        </div>
+        <div class="hero-metrics" aria-live="polite">
+          <div class="metric-tile primary">
+            <span>Break-even new base</span>
+            <strong id="breakEvenHero">$—</strong>
+          </div>
+          <div class="metric-tile">
+            <span>Stay total</span>
+            <strong id="stayHero">$—</strong>
+          </div>
+          <div class="metric-tile">
+            <span>Best switch delta</span>
+            <strong id="bestDeltaHero">$—</strong>
+          </div>
+        </div>
+      </section>
+
+      <nav class="segmented-tabs" aria-label="Main sections">
+        <button class="tab active" type="button" data-tab="dashboard">Dashboard</button>
+        <button class="tab" type="button" data-tab="whatif">What-if Lab</button>
+        <button class="tab" type="button" data-tab="inputs">Inputs</button>
+        <button class="tab" type="button" data-tab="rsus">RSUs</button>
+        <button class="tab" type="button" data-tab="report">Report</button>
+      </nav>
+
+      <section id="dashboard" class="panel active" aria-labelledby="dashboard-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Money dashboard</p>
+            <h2 id="dashboard-heading">Stay vs switch outcome</h2>
+          </div>
+          <div class="button-row compact">
+            <button class="pill-button" id="saveBtn" type="button">Save</button>
+            <button class="pill-button subtle" id="resetBtn" type="button">Reset</button>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <article class="kpi-card elevated">
+            <span>Stay at current company</span>
+            <strong id="stayTotalKpi">$—</strong>
+            <small id="staySubtitle">Net through end date</small>
+          </article>
+          <article class="kpi-card elevated">
+            <span>Switch at selected base</span>
+            <strong id="selectedSwitchKpi">$—</strong>
+            <small id="selectedSwitchSubtitle">Includes repayment assumptions</small>
+          </article>
+          <article class="kpi-card elevated" id="deltaCard">
+            <span>Difference vs staying</span>
+            <strong id="selectedDeltaKpi">$—</strong>
+            <small id="deltaSubtitle">Positive means switch wins</small>
+          </article>
+          <article class="kpi-card elevated">
+            <span>Recommended floor</span>
+            <strong id="floorKpi">$—</strong>
+            <small>First scenario beating stay total</small>
+          </article>
+        </div>
+
+        <div class="dashboard-grid">
+          <article class="chart-card elevated">
+            <div class="card-heading">
+              <div>
+                <h3>Scenario totals</h3>
+                <p>Net money by Nov 1, 2029 across base salary offers.</p>
+              </div>
+              <span class="status-chip" id="scenarioChip">Live</span>
+            </div>
+            <div id="scenarioChart" class="chart-frame" role="img" aria-label="Scenario totals bar chart"></div>
+          </article>
+
+          <article class="chart-card elevated">
+            <div class="card-heading">
+              <div>
+                <h3>Cumulative cash path</h3>
+                <p>Estimated take-home path for staying vs selected switch salary.</p>
+              </div>
+              <span class="status-chip neutral" id="lineChip">Monthly</span>
+            </div>
+            <div id="cashPathChart" class="chart-frame" role="img" aria-label="Cumulative cash line chart"></div>
+          </article>
+        </div>
+
+        <article class="table-card elevated">
+          <div class="card-heading">
+            <div>
+              <h3>What-if salary scenarios</h3>
+              <p>Green means switching produces same or more net money than staying.</p>
+            </div>
+            <button id="exportCsvBtn" class="pill-button subtle" type="button">Export CSV</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>New base</th>
+                  <th>New salary net</th>
+                  <th>Switch total</th>
+                  <th>Delta vs stay</th>
+                  <th>Decision</th>
+                </tr>
+              </thead>
+              <tbody id="scenarioTableBody"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section id="whatif" class="panel" aria-labelledby="whatif-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Offer lab</p>
+            <h2 id="whatif-heading">Move one number and see the deal quality</h2>
+          </div>
+        </div>
+
+        <div class="lab-grid">
+          <article class="lab-card elevated">
+            <label class="range-label" for="selectedBaseRange">
+              <span>Selected new base salary</span>
+              <strong id="selectedBaseLabel">$140,000</strong>
+            </label>
+            <input id="selectedBaseRange" type="range" min="100000" max="180000" step="1000" value="140000" />
+            <div class="range-scale" aria-hidden="true">
+              <span>$100k</span><span>$140k</span><span>$180k</span>
+            </div>
+            <div class="offer-verdict" id="offerVerdict">
+              <span class="verdict-badge">—</span>
+              <p>Adjust the slider to test an offer.</p>
+            </div>
+          </article>
+
+          <article class="breakdown-card elevated">
+            <h3>Selected switch breakdown</h3>
+            <div id="selectedBreakdown" class="breakdown-list"></div>
+          </article>
+
+          <article class="breakdown-card elevated">
+            <h3>Stay breakdown</h3>
+            <div id="stayBreakdown" class="breakdown-list"></div>
+          </article>
+        </div>
+      </section>
+
+      <section id="inputs" class="panel" aria-labelledby="inputs-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Assumptions</p>
+            <h2 id="inputs-heading">Edit timeline, compensation, taxes, and repayments</h2>
+          </div>
+          <button class="pill-button subtle" id="exportJsonBtn" type="button">Export JSON</button>
+        </div>
+
+        <div class="form-grid">
+          <article class="form-card elevated">
+            <h3>Timeline</h3>
+            <div class="input-grid three">
+              <label>Join date
+                <input type="date" data-bind="timeline.startDate" />
+              </label>
+              <label>Switch date
+                <input type="date" data-bind="timeline.switchDate" />
+              </label>
+              <label>Analysis end date
+                <input type="date" data-bind="timeline.endDate" />
+              </label>
+            </div>
+            <p class="helper">Salary is prorated daily using actual day counts over 365.</p>
+          </article>
+
+          <article class="form-card elevated">
+            <h3>Current company</h3>
+            <div class="input-grid two">
+              <label>Company name
+                <input type="text" data-bind="current.name" />
+              </label>
+              <label>Location / tax profile
+                <input type="text" data-bind="current.location" />
+              </label>
+              <label>Annual base salary
+                <input type="number" min="0" step="1000" data-bind="current.base" />
+              </label>
+              <label>Take-home rate %
+                <input type="number" min="0" max="100" step="0.1" data-bind="current.takeHome" />
+              </label>
+              <label>First sign-on gross
+                <input type="number" min="0" step="100" data-bind="current.signOn1" />
+              </label>
+              <label>First sign-on repayment months
+                <input type="number" min="0" step="1" data-bind="current.signOn1RepayMonths" />
+              </label>
+              <label>Second-year sign-on gross
+                <input type="number" min="0" step="100" data-bind="current.signOn2" />
+              </label>
+              <label>Relocation paid / kept if stay
+                <input type="number" step="100" data-bind="current.relocationNet" />
+              </label>
+              <label>Second bonus earning start
+                <input type="date" data-bind="current.secondBonusStart" />
+              </label>
+              <label>Second bonus earning end
+                <input type="date" data-bind="current.secondBonusEnd" />
+              </label>
+              <label>Relocation repayment if switch
+                <input type="number" step="100" data-bind="current.relocationRepayOnSwitch" />
+              </label>
+              <label>RSU stock price estimate
+                <input type="number" min="0" step="0.01" data-bind="current.rsuPrice" />
+              </label>
+              <label>Total RSUs granted
+                <input type="number" min="0" step="1" data-bind="current.rsuShares" />
+              </label>
+              <label>RSU take-home rate %
+                <input type="number" min="0" max="100" step="0.1" data-bind="current.rsuTakeHome" />
+              </label>
+            </div>
+          </article>
+
+          <article class="form-card elevated">
+            <h3>New company</h3>
+            <div class="input-grid two">
+              <label>Company name
+                <input type="text" data-bind="newCompany.name" />
+              </label>
+              <label>Location / tax profile
+                <input type="text" data-bind="newCompany.location" />
+              </label>
+              <label>Take-home rate %
+                <input type="number" min="0" max="100" step="0.1" data-bind="newCompany.takeHome" />
+              </label>
+              <label>New company relocation cash
+                <input type="number" step="100" data-bind="newCompany.relocationNet" />
+              </label>
+            </div>
+            <label class="full-label">Base salary scenarios, comma-separated
+              <textarea rows="3" data-bind="newCompany.scenarios"></textarea>
+            </label>
+            <p class="helper">Example: 120000, 125000, 130000, 135000, 140000, 145000, 150000</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="rsus" class="panel" aria-labelledby="rsus-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Equity schedule</p>
+            <h2 id="rsus-heading">RSU vesting editor</h2>
+          </div>
+          <button class="pill-button" id="addRsuBtn" type="button">Add vest</button>
+        </div>
+
+        <article class="table-card elevated">
+          <div class="card-heading">
+            <div>
+              <h3>Amazon default vest schedule</h3>
+              <p>5%, 15%, then 20% every six months. Edit dates and percentages to match another offer.</p>
+            </div>
+            <span class="status-chip neutral" id="vestTotalChip">100%</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Vest date</th>
+                  <th>Percent</th>
+                  <th>Shares</th>
+                  <th>Gross value</th>
+                  <th>Net value</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="rsuTableBody"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <section id="report" class="panel" aria-labelledby="report-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Audit trail</p>
+            <h2 id="report-heading">Calculation report</h2>
+          </div>
+          <div class="button-row compact">
+            <button class="pill-button" id="copyReportBtn" type="button">Copy summary</button>
+            <button class="pill-button subtle" id="printBtn" type="button">Print</button>
+          </div>
+        </div>
+
+        <article class="report-card elevated">
+          <div id="reportOutput" class="report-output"></div>
+        </article>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <p>Built for local what-if analysis. This is not tax, legal, immigration, or financial advice.</p>
+    </footer>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  </div>
+
+  <script>
+/* OfferVerse SwitchLab: private compensation calculator with local-only state. */
+(function () {
+  'use strict';
+
+  const STORAGE_KEY = 'offerverse-switchlab-state-v1';
+  const THEME_KEY = 'offerverse-switchlab-theme';
+  const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+  const DEFAULT_STATE = {
+    timeline: {
+      startDate: '2025-10-20',
+      switchDate: '2026-11-01',
+      endDate: '2029-11-01'
+    },
+    current: {
+      name: 'Amazon',
+      location: 'Arizona / H-1B',
+      base: 110000,
+      takeHome: 76,
+      signOn1: 18200,
+      signOn1RepayMonths: 12,
+      signOn2: 13500,
+      secondBonusStart: '2026-10-20',
+      secondBonusEnd: '2027-10-20',
+      relocationNet: 7000,
+      relocationRepayOnSwitch: 3500,
+      rsuShares: 170,
+      rsuPrice: 241.70,
+      rsuTakeHome: 76
+    },
+    newCompany: {
+      name: 'Cap One',
+      location: 'Virginia / H-1B',
+      takeHome: 70,
+      relocationNet: 0,
+      scenarios: '120000, 125000, 130000, 135000, 140000, 145000, 150000'
+    },
+    ui: {
+      selectedBase: 140000
+    },
+    rsuVests: [
+      { date: '2026-10-15', percent: 5 },
+      { date: '2027-10-15', percent: 15 },
+      { date: '2028-04-15', percent: 20 },
+      { date: '2028-10-15', percent: 20 },
+      { date: '2029-04-15', percent: 20 },
+      { date: '2029-10-15', percent: 20 }
+    ]
+  };
+
+  let state = loadState();
+  let lastResults = null;
+  let installPrompt = null;
+
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+
+  function clone(obj) {
+    return JSON.parse(JSON.stringify(obj));
+  }
+
+  function loadState() {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (!saved) return clone(DEFAULT_STATE);
+      return mergeDeep(clone(DEFAULT_STATE), JSON.parse(saved));
+    } catch (err) {
+      console.warn('Unable to load state. Falling back to defaults.', err);
+      return clone(DEFAULT_STATE);
+    }
+  }
+
+  function mergeDeep(target, source) {
+    if (!source || typeof source !== 'object') return target;
+    for (const key of Object.keys(source)) {
+      if (Array.isArray(source[key])) {
+        target[key] = source[key];
+      } else if (source[key] && typeof source[key] === 'object') {
+        target[key] = mergeDeep(target[key] || {}, source[key]);
+      } else {
+        target[key] = source[key];
+      }
+    }
+    return target;
+  }
+
+  function getPath(obj, path) {
+    return path.split('.').reduce((acc, key) => (acc ? acc[key] : undefined), obj);
+  }
+
+  function setPath(obj, path, value) {
+    const parts = path.split('.');
+    const last = parts.pop();
+    const target = parts.reduce((acc, key) => {
+      if (!acc[key]) acc[key] = {};
+      return acc[key];
+    }, obj);
+    target[last] = value;
+  }
+
+  function parseDate(value) {
+    if (!value) return null;
+    const [year, month, day] = String(value).split('-').map(Number);
+    if (!year || !month || !day) return null;
+    return new Date(Date.UTC(year, month - 1, day));
+  }
+
+  function formatDate(date) {
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) return '';
+    return date.toISOString().slice(0, 10);
+  }
+
+  function addMonths(dateValue, months) {
+    const d = parseDate(dateValue);
+    if (!d) return null;
+    const day = d.getUTCDate();
+    const output = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + Number(months || 0), 1));
+    const maxDay = new Date(Date.UTC(output.getUTCFullYear(), output.getUTCMonth() + 1, 0)).getUTCDate();
+    output.setUTCDate(Math.min(day, maxDay));
+    return output;
+  }
+
+  function daysBetween(startValue, endValue) {
+    const start = startValue instanceof Date ? startValue : parseDate(startValue);
+    const end = endValue instanceof Date ? endValue : parseDate(endValue);
+    if (!start || !end) return 0;
+    return Math.max(0, Math.round((end.getTime() - start.getTime()) / MS_PER_DAY));
+  }
+
+  function dateLE(aValue, bValue) {
+    const a = aValue instanceof Date ? aValue : parseDate(aValue);
+    const b = bValue instanceof Date ? bValue : parseDate(bValue);
+    if (!a || !b) return false;
+    return a.getTime() <= b.getTime();
+  }
+
+  function overlapDays(startA, endA, startB, endB) {
+    const a1 = parseDate(startA);
+    const a2 = parseDate(endA);
+    const b1 = parseDate(startB);
+    const b2 = parseDate(endB);
+    if (!a1 || !a2 || !b1 || !b2) return 0;
+    const start = new Date(Math.max(a1.getTime(), b1.getTime()));
+    const end = new Date(Math.min(a2.getTime(), b2.getTime()));
+    return daysBetween(start, end);
+  }
+
+  function pct(value) {
+    return Number(value || 0) / 100;
+  }
+
+  function money(value, options = {}) {
+    const digits = options.digits ?? 0;
+    const signDisplay = options.signDisplay || 'auto';
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      maximumFractionDigits: digits,
+      minimumFractionDigits: digits,
+      signDisplay
+    }).format(Number(value || 0));
+  }
+
+  function number(value, digits = 1) {
+    return new Intl.NumberFormat('en-US', { maximumFractionDigits: digits }).format(Number(value || 0));
+  }
+
+  function yearsBetween(start, end) {
+    return daysBetween(start, end) / 365;
+  }
+
+  function salaryNet(base, start, end, takeHomeRate) {
+    return Number(base || 0) * takeHomeRate * yearsBetween(start, end);
+  }
+
+  function signOnRepayment(gross, startDate, leaveDate, repayMonths) {
+    const months = Number(repayMonths || 0);
+    const repaymentEnd = addMonths(startDate, months);
+    if (!repaymentEnd || dateLE(repaymentEnd, leaveDate) || months <= 0) return 0;
+    const totalDays = daysBetween(startDate, repaymentEnd);
+    const unearnedDays = daysBetween(leaveDate, repaymentEnd);
+    if (totalDays <= 0) return 0;
+    return Number(gross || 0) * (unearnedDays / totalDays);
+  }
+
+  function proratedBonusNet(gross, periodStart, periodEnd, employmentStart, employmentEnd, takeHomeRate) {
+    const periodDays = daysBetween(periodStart, periodEnd);
+    if (periodDays <= 0) return 0;
+    const earnedDays = overlapDays(periodStart, periodEnd, employmentStart, employmentEnd);
+    return Number(gross || 0) * (earnedDays / periodDays) * takeHomeRate;
+  }
+
+  function rsuNetUntil(cutoffDate, appState = state) {
+    const totalShares = Number(appState.current.rsuShares || 0);
+    const price = Number(appState.current.rsuPrice || 0);
+    const takeHome = pct(appState.current.rsuTakeHome);
+    let gross = 0;
+    let net = 0;
+    const included = [];
+
+    for (const vest of appState.rsuVests || []) {
+      if (dateLE(vest.date, cutoffDate)) {
+        const shares = totalShares * Number(vest.percent || 0) / 100;
+        const grossValue = shares * price;
+        const netValue = grossValue * takeHome;
+        gross += grossValue;
+        net += netValue;
+        included.push({ ...vest, shares, gross: grossValue, net: netValue });
+      }
+    }
+    return { gross, net, included };
+  }
+
+  function parseScenarios(value) {
+    return String(value || '')
+      .split(/[\n,]+/)
+      .map(item => Number(String(item).replace(/[^0-9.]/g, '')))
+      .filter(item => Number.isFinite(item) && item > 0)
+      .sort((a, b) => a - b);
+  }
+
+  function calculate(appState = state) {
+    const start = appState.timeline.startDate;
+    const switchDate = appState.timeline.switchDate;
+    const end = appState.timeline.endDate;
+    const currentTakeHome = pct(appState.current.takeHome);
+    const newTakeHome = pct(appState.newCompany.takeHome);
+
+    const staySalaryNet = salaryNet(appState.current.base, start, end, currentTakeHome);
+    const staySignOn1Net = Number(appState.current.signOn1 || 0) * currentTakeHome;
+    const staySecondSignOnNet = proratedBonusNet(
+      appState.current.signOn2,
+      appState.current.secondBonusStart,
+      appState.current.secondBonusEnd,
+      start,
+      end,
+      currentTakeHome
+    );
+    const stayRsu = rsuNetUntil(end, appState);
+    const stayRelocationNet = Number(appState.current.relocationNet || 0);
+    const stayTotal = staySalaryNet + staySignOn1Net + staySecondSignOnNet + stayRsu.net + stayRelocationNet;
+
+    const preSwitchSalaryNet = salaryNet(appState.current.base, start, switchDate, currentTakeHome);
+    const signOn1Repayment = signOnRepayment(
+      appState.current.signOn1,
+      start,
+      switchDate,
+      appState.current.signOn1RepayMonths
+    );
+    const preSwitchSignOn1Net = staySignOn1Net - signOn1Repayment;
+    const preSwitchSecondSignOnNet = proratedBonusNet(
+      appState.current.signOn2,
+      appState.current.secondBonusStart,
+      appState.current.secondBonusEnd,
+      start,
+      switchDate,
+      currentTakeHome
+    );
+    const preSwitchRsu = rsuNetUntil(switchDate, appState);
+    const preSwitchRelocationNet = Number(appState.current.relocationNet || 0) - Number(appState.current.relocationRepayOnSwitch || 0);
+    const preSwitchTotal = preSwitchSalaryNet + preSwitchSignOn1Net + preSwitchSecondSignOnNet + preSwitchRsu.net + preSwitchRelocationNet;
+
+    const newRelocationNet = Number(appState.newCompany.relocationNet || 0);
+    const scenarioBases = parseScenarios(appState.newCompany.scenarios);
+    if (!scenarioBases.includes(Number(appState.ui.selectedBase || 0))) {
+      scenarioBases.push(Number(appState.ui.selectedBase || 0));
+      scenarioBases.sort((a, b) => a - b);
+    }
+
+    const scenarioDays = daysBetween(switchDate, end);
+    const scenarioYears = scenarioDays / 365;
+    const scenarios = scenarioBases.map(base => {
+      const newSalaryNet = salaryNet(base, switchDate, end, newTakeHome);
+      const switchTotal = preSwitchTotal + newSalaryNet + newRelocationNet;
+      const delta = switchTotal - stayTotal;
+      return { base, newSalaryNet, switchTotal, delta, wins: delta >= 0 };
+    });
+
+    const selectedBase = Number(appState.ui.selectedBase || 0);
+    const selectedNewSalaryNet = salaryNet(selectedBase, switchDate, end, newTakeHome);
+    const selectedSwitchTotal = preSwitchTotal + selectedNewSalaryNet + newRelocationNet;
+    const selectedDelta = selectedSwitchTotal - stayTotal;
+    const breakEvenBase = scenarioYears > 0 && newTakeHome > 0
+      ? (stayTotal - preSwitchTotal - newRelocationNet) / (newTakeHome * scenarioYears)
+      : 0;
+    const firstWinningScenario = scenarios.find(s => s.wins) || null;
+    const bestScenario = scenarios.reduce((best, item) => !best || item.delta > best.delta ? item : best, null);
+
+    return {
+      start,
+      switchDate,
+      end,
+      currentTakeHome,
+      newTakeHome,
+      stay: {
+        salaryNet: staySalaryNet,
+        signOn1Net: staySignOn1Net,
+        secondSignOnNet: staySecondSignOnNet,
+        rsuNet: stayRsu.net,
+        rsuGross: stayRsu.gross,
+        relocationNet: stayRelocationNet,
+        total: stayTotal,
+        rsuIncluded: stayRsu.included
+      },
+      preSwitch: {
+        salaryNet: preSwitchSalaryNet,
+        signOn1Net: preSwitchSignOn1Net,
+        signOn1Repayment,
+        secondSignOnNet: preSwitchSecondSignOnNet,
+        rsuNet: preSwitchRsu.net,
+        rsuGross: preSwitchRsu.gross,
+        relocationNet: preSwitchRelocationNet,
+        total: preSwitchTotal,
+        rsuIncluded: preSwitchRsu.included
+      },
+      scenarios,
+      selected: {
+        base: selectedBase,
+        newSalaryNet: selectedNewSalaryNet,
+        newRelocationNet,
+        switchTotal: selectedSwitchTotal,
+        delta: selectedDelta,
+        wins: selectedDelta >= 0
+      },
+      breakEvenBase,
+      firstWinningScenario,
+      bestScenario,
+      dayCounts: {
+        stayDays: daysBetween(start, end),
+        amazonBeforeSwitchDays: daysBetween(start, switchDate),
+        newCompanyDays: scenarioDays
+      }
+    };
+  }
+
+  function bindInputs() {
+    $$('[data-bind]').forEach(input => {
+      const path = input.dataset.bind;
+      const value = getPath(state, path);
+      input.value = value ?? '';
+      input.addEventListener('input', () => {
+        let next = input.value;
+        if (input.type === 'number') next = Number(input.value || 0);
+        setPath(state, path, next);
+        recalc();
+      });
+    });
+
+    const range = $('#selectedBaseRange');
+    range.value = state.ui.selectedBase;
+    range.addEventListener('input', () => {
+      state.ui.selectedBase = Number(range.value || 0);
+      recalc();
+    });
+  }
+
+  function syncInputsFromState() {
+    $$('[data-bind]').forEach(input => {
+      const value = getPath(state, input.dataset.bind);
+      input.value = value ?? '';
+    });
+    $('#selectedBaseRange').value = state.ui.selectedBase;
+  }
+
+  function setText(id, value) {
+    const element = $(id);
+    if (element) element.textContent = value;
+  }
+
+  function recalc() {
+    lastResults = calculate(state);
+    renderHero(lastResults);
+    renderKpis(lastResults);
+    renderScenarioTable(lastResults);
+    renderBreakdowns(lastResults);
+    renderRsuTable(lastResults);
+    renderScenarioChart(lastResults);
+    renderCashPathChart(lastResults);
+    renderReport(lastResults);
+  }
+
+  function renderHero(results) {
+    setText('#breakEvenHero', money(results.breakEvenBase));
+    setText('#stayHero', money(results.stay.total));
+    setText('#bestDeltaHero', results.bestScenario ? money(results.bestScenario.delta, { signDisplay: 'always' }) : '$—');
+  }
+
+  function renderKpis(results) {
+    setText('#stayTotalKpi', money(results.stay.total));
+    setText('#staySubtitle', `${state.current.name} through ${state.timeline.endDate}`);
+    setText('#selectedSwitchKpi', money(results.selected.switchTotal));
+    setText('#selectedSwitchSubtitle', `${state.newCompany.name} at ${money(results.selected.base)} base`);
+    setText('#selectedDeltaKpi', money(results.selected.delta, { signDisplay: 'always' }));
+    setText('#deltaSubtitle', results.selected.wins ? 'Switch is ahead' : 'Stay is ahead');
+    setText('#floorKpi', results.firstWinningScenario ? money(results.firstWinningScenario.base) : money(Math.ceil(results.breakEvenBase / 1000) * 1000));
+    setText('#selectedBaseLabel', money(results.selected.base));
+
+    const deltaCard = $('#deltaCard');
+    deltaCard.classList.toggle('good', results.selected.wins);
+    deltaCard.classList.toggle('bad', !results.selected.wins);
+
+    const verdict = $('#offerVerdict');
+    const badge = $('.verdict-badge', verdict);
+    verdict.classList.toggle('good', results.selected.wins);
+    verdict.classList.toggle('bad', !results.selected.wins);
+    badge.textContent = results.selected.wins ? 'Switch wins' : 'Stay wins';
+    $('p', verdict).textContent = results.selected.wins
+      ? `${money(results.selected.base)} base is ${money(results.selected.delta, { signDisplay: 'always' })} ahead by the end date. For a real raise, target above break-even, not just equal.`
+      : `${money(results.selected.base)} base is ${money(Math.abs(results.selected.delta))} behind staying. Break-even is about ${money(results.breakEvenBase)}.`;
+  }
+
+  function renderScenarioTable(results) {
+    const tbody = $('#scenarioTableBody');
+    tbody.innerHTML = '';
+    for (const scenario of results.scenarios) {
+      const tr = document.createElement('tr');
+      const decisionClass = Math.abs(scenario.delta) < 1000 ? 'neutral' : scenario.wins ? 'good' : 'bad';
+      const decisionText = Math.abs(scenario.delta) < 1000 ? 'Break-even' : scenario.wins ? 'Switch wins' : 'Stay wins';
+      tr.innerHTML = `
+        <td>${money(scenario.base)}</td>
+        <td>${money(scenario.newSalaryNet)}</td>
+        <td>${money(scenario.switchTotal)}</td>
+        <td class="${scenario.delta >= 0 ? 'delta-good' : 'delta-bad'}">${money(scenario.delta, { signDisplay: 'always' })}</td>
+        <td><span class="decision-pill ${decisionClass}">${decisionText}</span></td>
+      `;
+      tbody.appendChild(tr);
+    }
+  }
+
+  function renderBreakdowns(results) {
+    $('#stayBreakdown').innerHTML = breakdownHtml([
+      ['Base salary net', results.stay.salaryNet],
+      ['First sign-on net', results.stay.signOn1Net],
+      ['Second-year sign-on net', results.stay.secondSignOnNet],
+      ['RSU net value', results.stay.rsuNet],
+      ['Relocation kept', results.stay.relocationNet],
+      ['Total stay value', results.stay.total, true]
+    ]);
+
+    $('#selectedBreakdown').innerHTML = breakdownHtml([
+      [`${state.current.name} pre-switch salary`, results.preSwitch.salaryNet],
+      ['First sign-on net after repayment', results.preSwitch.signOn1Net],
+      ['Second-year sign-on earned', results.preSwitch.secondSignOnNet],
+      ['RSU net before switch', results.preSwitch.rsuNet],
+      ['Current relocation after repayment', results.preSwitch.relocationNet],
+      [`${state.newCompany.name} salary net`, results.selected.newSalaryNet],
+      [`${state.newCompany.name} relocation`, results.selected.newRelocationNet],
+      ['Total switch value', results.selected.switchTotal, true]
+    ]);
+  }
+
+  function breakdownHtml(rows) {
+    return rows.map(([label, value, total]) => `
+      <div class="breakdown-row ${total ? 'total' : ''}">
+        <span>${escapeHtml(label)}</span>
+        <strong>${money(value)}</strong>
+      </div>
+    `).join('');
+  }
+
+  function renderRsuTable(results) {
+    const tbody = $('#rsuTableBody');
+    tbody.innerHTML = '';
+    const totalShares = Number(state.current.rsuShares || 0);
+    const price = Number(state.current.rsuPrice || 0);
+    const rsuTakeHome = pct(state.current.rsuTakeHome);
+    const totalPercent = (state.rsuVests || []).reduce((sum, vest) => sum + Number(vest.percent || 0), 0);
+    const chip = $('#vestTotalChip');
+    chip.textContent = `${number(totalPercent, 2)}%`;
+    chip.classList.toggle('bad', Math.abs(totalPercent - 100) > 0.01);
+
+    state.rsuVests.forEach((vest, index) => {
+      const shares = totalShares * Number(vest.percent || 0) / 100;
+      const gross = shares * price;
+      const net = gross * rsuTakeHome;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><input type="date" value="${escapeAttr(vest.date)}" data-rsu-index="${index}" data-rsu-field="date" /></td>
+        <td><input type="number" min="0" step="0.1" value="${Number(vest.percent || 0)}" data-rsu-index="${index}" data-rsu-field="percent" /></td>
+        <td>${number(shares, 2)}</td>
+        <td>${money(gross)}</td>
+        <td>${money(net)}</td>
+        <td><button class="pill-button subtle" type="button" data-remove-rsu="${index}">Remove</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    $$('[data-rsu-field]', tbody).forEach(input => {
+      input.addEventListener('input', () => {
+        const index = Number(input.dataset.rsuIndex);
+        const field = input.dataset.rsuField;
+        state.rsuVests[index][field] = field === 'percent' ? Number(input.value || 0) : input.value;
+        recalc();
+      });
+    });
+
+    $$('[data-remove-rsu]', tbody).forEach(button => {
+      button.addEventListener('click', () => {
+        const index = Number(button.dataset.removeRsu);
+        state.rsuVests.splice(index, 1);
+        recalc();
+      });
+    });
+  }
+
+  function renderScenarioChart(results) {
+    const container = $('#scenarioChart');
+    const data = [
+      { label: 'Stay', value: results.stay.total, kind: 'stay', delta: 0 },
+      ...results.scenarios.map(s => ({ label: money(s.base).replace(',000', 'k').replace('$', '$'), value: s.switchTotal, kind: s.delta >= 0 ? 'positive' : 'negative', delta: s.delta }))
+    ];
+    const width = 760;
+    const height = 340;
+    const margin = { top: 34, right: 28, bottom: 72, left: 68 };
+    const values = data.map(d => d.value);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const floor = Math.max(0, min - 25000);
+    const ceiling = max + 18000;
+    const chartW = width - margin.left - margin.right;
+    const chartH = height - margin.top - margin.bottom;
+    const step = chartW / data.length;
+    const barW = Math.min(54, step * 0.58);
+    const y = value => margin.top + chartH - ((value - floor) / (ceiling - floor || 1)) * chartH;
+
+    const gridValues = [floor, floor + (ceiling - floor) / 2, ceiling];
+    const bars = data.map((d, i) => {
+      const x = margin.left + step * i + (step - barW) / 2;
+      const barY = y(d.value);
+      const barH = margin.top + chartH - barY;
+      const cls = d.kind === 'stay' ? 'bar-stay' : d.kind === 'positive' ? 'bar-positive' : 'bar-negative';
+      return `
+        <rect class="${cls}" x="${x}" y="${barY}" width="${barW}" height="${Math.max(4, barH)}" rx="14" />
+        <text class="chart-title" x="${x + barW / 2}" y="${barY - 8}" text-anchor="middle">${compactMoney(d.value)}</text>
+        <text class="chart-label" x="${x + barW / 2}" y="${height - 40}" text-anchor="middle">${escapeSvg(d.label)}</text>
+        ${d.kind !== 'stay' ? `<text class="chart-label" x="${x + barW / 2}" y="${height - 22}" text-anchor="middle">${compactSigned(d.delta)}</text>` : ''}
+      `;
+    }).join('');
+
+    container.innerHTML = `
+      <svg viewBox="0 0 ${width} ${height}" aria-hidden="true">
+        <defs>
+          <linearGradient id="barGood" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#10b981"/><stop offset="1" stop-color="#047857"/></linearGradient>
+          <linearGradient id="barBad" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#fb7185"/><stop offset="1" stop-color="#be123c"/></linearGradient>
+          <linearGradient id="barStay" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#818cf8"/><stop offset="1" stop-color="#4f46e5"/></linearGradient>
+        </defs>
+        ${gridValues.map(v => `<line class="grid-line" x1="${margin.left}" x2="${width - margin.right}" y1="${y(v)}" y2="${y(v)}"/><text class="chart-label" x="18" y="${y(v) + 4}">${compactMoney(v)}</text>`).join('')}
+        <line class="chart-axis" x1="${margin.left}" x2="${width - margin.right}" y1="${margin.top + chartH}" y2="${margin.top + chartH}" />
+        ${bars}
+      </svg>
+    `;
+  }
+
+  function monthlyPointsForScenario(results, selectedBase) {
+    const start = parseDate(state.timeline.startDate);
+    const end = parseDate(state.timeline.endDate);
+    if (!start || !end) return [];
+    const points = [];
+    const currentTakeHome = pct(state.current.takeHome);
+    const newTakeHome = pct(state.newCompany.takeHome);
+    let cursor = new Date(start.getTime());
+    let previous = new Date(start.getTime());
+    let stayCum = Number(state.current.relocationNet || 0) + Number(state.current.signOn1 || 0) * currentTakeHome;
+    let switchCum = stayCum;
+
+    while (cursor < end) {
+      cursor = new Date(Date.UTC(cursor.getUTCFullYear(), cursor.getUTCMonth() + 1, 1));
+      if (cursor > end) cursor = new Date(end.getTime());
+      const periodStart = formatDate(previous);
+      const periodEnd = formatDate(cursor);
+
+      stayCum += salaryNet(state.current.base, periodStart, periodEnd, currentTakeHome);
+      stayCum += proratedBonusNet(state.current.signOn2, state.current.secondBonusStart, state.current.secondBonusEnd, periodStart, periodEnd, currentTakeHome);
+
+      const beforeSwitchStart = periodStart;
+      const beforeSwitchEnd = minDateString(periodEnd, state.timeline.switchDate);
+      if (daysBetween(beforeSwitchStart, beforeSwitchEnd) > 0) {
+        switchCum += salaryNet(state.current.base, beforeSwitchStart, beforeSwitchEnd, currentTakeHome);
+        switchCum += proratedBonusNet(state.current.signOn2, state.current.secondBonusStart, state.current.secondBonusEnd, beforeSwitchStart, beforeSwitchEnd, currentTakeHome);
+      }
+      const afterSwitchStart = maxDateString(periodStart, state.timeline.switchDate);
+      const afterSwitchEnd = periodEnd;
+      if (daysBetween(afterSwitchStart, afterSwitchEnd) > 0) {
+        switchCum += salaryNet(selectedBase, afterSwitchStart, afterSwitchEnd, newTakeHome);
+      }
+
+      for (const vest of state.rsuVests) {
+        if (dateLE(periodStart, vest.date) && !dateLE(periodEnd, vest.date)) continue;
+        // no-op; handled by explicit window below
+      }
+      for (const vest of state.rsuVests) {
+        if (dateInWindow(vest.date, periodStart, periodEnd)) {
+          const value = Number(state.current.rsuShares || 0) * Number(vest.percent || 0) / 100 * Number(state.current.rsuPrice || 0) * pct(state.current.rsuTakeHome);
+          stayCum += value;
+          if (dateLE(vest.date, state.timeline.switchDate)) switchCum += value;
+        }
+      }
+
+      if (dateInWindow(state.timeline.switchDate, periodStart, periodEnd)) {
+        switchCum -= Number(state.current.relocationRepayOnSwitch || 0);
+        switchCum += Number(state.newCompany.relocationNet || 0);
+        switchCum -= signOnRepayment(state.current.signOn1, state.timeline.startDate, state.timeline.switchDate, state.current.signOn1RepayMonths);
+      }
+
+      points.push({
+        label: `${cursor.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' })} ${String(cursor.getUTCFullYear()).slice(2)}`,
+        stay: stayCum,
+        switch: switchCum
+      });
+      previous = new Date(cursor.getTime());
+      if (cursor.getTime() === end.getTime()) break;
+    }
+    return points;
+  }
+
+  function minDateString(a, b) {
+    const da = parseDate(a); const db = parseDate(b);
+    if (!da || !db) return a;
+    return da <= db ? a : b;
+  }
+
+  function maxDateString(a, b) {
+    const da = parseDate(a); const db = parseDate(b);
+    if (!da || !db) return a;
+    return da >= db ? a : b;
+  }
+
+  function dateInWindow(dateValue, startValue, endValue) {
+    const d = parseDate(dateValue);
+    const s = parseDate(startValue);
+    const e = parseDate(endValue);
+    if (!d || !s || !e) return false;
+    return d.getTime() >= s.getTime() && d.getTime() < e.getTime();
+  }
+
+  function renderCashPathChart(results) {
+    const container = $('#cashPathChart');
+    const allPoints = monthlyPointsForScenario(results, results.selected.base);
+    const points = allPoints.filter((_, index) => index % 3 === 0 || index === allPoints.length - 1);
+    const width = 760;
+    const height = 340;
+    const margin = { top: 30, right: 34, bottom: 62, left: 72 };
+    const chartW = width - margin.left - margin.right;
+    const chartH = height - margin.top - margin.bottom;
+    const values = points.flatMap(p => [p.stay, p.switch]);
+    const min = Math.min(0, ...values);
+    const max = Math.max(...values) * 1.05;
+    const x = i => margin.left + (points.length <= 1 ? 0 : (i / (points.length - 1)) * chartW);
+    const y = value => margin.top + chartH - ((value - min) / (max - min || 1)) * chartH;
+    const pathFor = key => points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${x(i)} ${y(p[key])}`).join(' ');
+    const tickEvery = Math.max(1, Math.ceil(points.length / 7));
+    const gridValues = [0, max / 2, max];
+
+    container.innerHTML = `
+      <svg viewBox="0 0 ${width} ${height}" aria-hidden="true">
+        ${gridValues.map(v => `<line class="grid-line" x1="${margin.left}" x2="${width - margin.right}" y1="${y(v)}" y2="${y(v)}"/><text class="chart-label" x="18" y="${y(v) + 4}">${compactMoney(v)}</text>`).join('')}
+        <line class="chart-axis" x1="${margin.left}" x2="${width - margin.right}" y1="${margin.top + chartH}" y2="${margin.top + chartH}" />
+        <path d="${pathFor('stay')}" fill="none" class="line-stay" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        <path d="${pathFor('switch')}" fill="none" class="line-switch" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        ${points.map((p, i) => i % tickEvery === 0 || i === points.length - 1 ? `<text class="chart-label" x="${x(i)}" y="${height - 32}" text-anchor="middle">${escapeSvg(p.label)}</text>` : '').join('')}
+        ${points.map((p, i) => `<circle class="dot-stay" cx="${x(i)}" cy="${y(p.stay)}" r="3"/><circle class="dot-switch" cx="${x(i)}" cy="${y(p.switch)}" r="3"/>`).join('')}
+        <text class="chart-title" x="${width - 190}" y="28">Stay</text><circle class="dot-stay" cx="${width - 204}" cy="24" r="5" />
+        <text class="chart-title" x="${width - 105}" y="28">Switch</text><circle class="dot-switch" cx="${width - 119}" cy="24" r="5" />
+      </svg>
+    `;
+  }
+
+  function renderReport(results) {
+    const report = $('#reportOutput');
+    report.innerHTML = `
+      <h3>Executive summary</h3>
+      <p>Staying at <strong>${escapeHtml(state.current.name)}</strong> until <code>${state.timeline.endDate}</code> is estimated at <strong>${money(results.stay.total)}</strong> net/cash value. Switching to <strong>${escapeHtml(state.newCompany.name)}</strong> on <code>${state.timeline.switchDate}</code> at the selected base of <strong>${money(results.selected.base)}</strong> is estimated at <strong>${money(results.selected.switchTotal)}</strong>, which is <strong class="${results.selected.delta >= 0 ? 'delta-good' : 'delta-bad'}">${money(results.selected.delta, { signDisplay: 'always' })}</strong> vs staying.</p>
+      <h3>Break-even target</h3>
+      <p>The calculated break-even new base is <strong>${money(results.breakEvenBase)}</strong>. A practical negotiation floor would be around <strong>${money(Math.ceil(results.breakEvenBase / 1000) * 1000)}</strong>, and a stronger target would be above that if the goal is meaningfully more money.</p>
+      <h3>Default scenario details</h3>
+      <ul>
+        <li>Current base: <strong>${money(state.current.base)}</strong>, take-home rate: <strong>${number(state.current.takeHome, 1)}%</strong>.</li>
+        <li>New company take-home rate: <strong>${number(state.newCompany.takeHome, 1)}%</strong>.</li>
+        <li>First sign-on gross: <strong>${money(state.current.signOn1)}</strong>; repayment if switch: <strong>${money(results.preSwitch.signOn1Repayment)}</strong>.</li>
+        <li>Second-year sign-on gross: <strong>${money(state.current.signOn2)}</strong>; earned before switch: <strong>${money(results.preSwitch.secondSignOnNet)}</strong>.</li>
+        <li>Relocation kept if stay: <strong>${money(state.current.relocationNet)}</strong>; switch repayment: <strong>${money(state.current.relocationRepayOnSwitch)}</strong>.</li>
+        <li>RSUs: <strong>${number(state.current.rsuShares, 2)}</strong> shares at <strong>${money(state.current.rsuPrice, { digits: 2 })}</strong> with <strong>${number(state.current.rsuTakeHome, 1)}%</strong> take-home rate.</li>
+      </ul>
+      <h3>Day-count audit</h3>
+      <ul>
+        <li>Stay salary days: <strong>${results.dayCounts.stayDays}</strong>.</li>
+        <li>Current company days before switch: <strong>${results.dayCounts.amazonBeforeSwitchDays}</strong>.</li>
+        <li>New company salary days: <strong>${results.dayCounts.newCompanyDays}</strong>.</li>
+      </ul>
+    `;
+  }
+
+  function saveState() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    showToast('Saved locally on this device');
+  }
+
+  function resetState() {
+    state = clone(DEFAULT_STATE);
+    syncInputsFromState();
+    recalc();
+    localStorage.removeItem(STORAGE_KEY);
+    showToast('Reset to your Amazon → Cap One defaults');
+  }
+
+  function exportCsv() {
+    const results = lastResults || calculate(state);
+    const rows = [
+      ['new_base', 'new_salary_net', 'switch_total', 'delta_vs_stay', 'decision'],
+      ...results.scenarios.map(s => [s.base, round2(s.newSalaryNet), round2(s.switchTotal), round2(s.delta), s.wins ? 'switch_wins' : 'stay_wins'])
+    ];
+    downloadFile('offerverse-switchlab-scenarios.csv', rows.map(row => row.join(',')).join('\n'), 'text/csv');
+  }
+
+  function exportJson() {
+    const payload = JSON.stringify({ state, results: lastResults || calculate(state) }, null, 2);
+    downloadFile('offerverse-switchlab-analysis.json', payload, 'application/json');
+  }
+
+  function copyReport() {
+    const results = lastResults || calculate(state);
+    const lines = [
+      `OfferVerse SwitchLab summary`,
+      `Stay total: ${money(results.stay.total)}`,
+      `Selected switch base: ${money(results.selected.base)}`,
+      `Selected switch total: ${money(results.selected.switchTotal)}`,
+      `Delta vs stay: ${money(results.selected.delta, { signDisplay: 'always' })}`,
+      `Break-even base: ${money(results.breakEvenBase)}`,
+      `Practical floor: ${money(Math.ceil(results.breakEvenBase / 1000) * 1000)}`
+    ];
+    navigator.clipboard?.writeText(lines.join('\n')).then(() => showToast('Summary copied')).catch(() => showToast('Copy failed'));
+  }
+
+  function downloadFile(filename, content, type) {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function round2(value) {
+    return Math.round(Number(value || 0) * 100) / 100;
+  }
+
+  function compactMoney(value) {
+    const abs = Math.abs(Number(value || 0));
+    const sign = Number(value || 0) < 0 ? '-' : '';
+    if (abs >= 1000000) return `${sign}$${(abs / 1000000).toFixed(1)}M`;
+    if (abs >= 1000) return `${sign}$${Math.round(abs / 1000)}k`;
+    return `${sign}$${Math.round(abs)}`;
+  }
+
+  function compactSigned(value) {
+    const sign = Number(value || 0) >= 0 ? '+' : '-';
+    return `${sign}${compactMoney(Math.abs(value)).replace('$', '$')}`;
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>'"]/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[char]));
+  }
+
+  function escapeAttr(value) {
+    return escapeHtml(value).replace(/`/g, '&#096;');
+  }
+
+  function escapeSvg(value) {
+    return escapeHtml(value);
+  }
+
+  function showToast(message) {
+    const toast = $('#toast');
+    toast.textContent = message;
+    toast.classList.add('show');
+    clearTimeout(showToast.timer);
+    showToast.timer = setTimeout(() => toast.classList.remove('show'), 2200);
+  }
+
+  function setupTabs() {
+    $$('.tab').forEach(button => {
+      button.addEventListener('click', () => {
+        $$('.tab').forEach(tab => tab.classList.toggle('active', tab === button));
+        $$('.panel').forEach(panel => panel.classList.toggle('active', panel.id === button.dataset.tab));
+      });
+    });
+  }
+
+  function setupButtons() {
+    $('#saveBtn').addEventListener('click', saveState);
+    $('#resetBtn').addEventListener('click', resetState);
+    $('#exportCsvBtn').addEventListener('click', exportCsv);
+    $('#exportJsonBtn').addEventListener('click', exportJson);
+    $('#copyReportBtn').addEventListener('click', copyReport);
+    $('#printBtn').addEventListener('click', () => window.print());
+    $('#addRsuBtn').addEventListener('click', () => {
+      state.rsuVests.push({ date: state.timeline.endDate, percent: 0 });
+      recalc();
+      showToast('Added RSU vest row');
+    });
+  }
+
+  function setupTheme() {
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.classList.toggle('dark', savedTheme ? savedTheme === 'dark' : prefersDark);
+    $('#themeToggle').addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light');
+    });
+  }
+
+  function setupInstallPrompt() {
+    window.addEventListener('beforeinstallprompt', event => {
+      event.preventDefault();
+      installPrompt = event;
+      $('#installBtn').classList.remove('hidden');
+    });
+    $('#installBtn').addEventListener('click', async () => {
+      if (!installPrompt) return;
+      installPrompt.prompt();
+      await installPrompt.userChoice;
+      installPrompt = null;
+      $('#installBtn').classList.add('hidden');
+    });
+  }
+
+  function setupServiceWorker() {
+    if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+      navigator.serviceWorker.register('./sw.js').catch(err => console.warn('Service worker registration failed', err));
+    }
+  }
+
+  function init() {
+    setupTheme();
+    setupTabs();
+    bindInputs();
+    setupButtons();
+    setupInstallPrompt();
+    setupServiceWorker();
+    recalc();
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+})();
+
+  </script>
+</body>
+</html>
