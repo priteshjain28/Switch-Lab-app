@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<meta name="theme-color" content="#4f46e5" />
+<title>SwitchLab</title>
+<style>
+:root{
+  --bg1:#eef2ff; --bg2:#f6f7fb; --surface:#ffffff; --surface-2:#f4f6fc;
+  --text:#0f172a; --muted:#6b7280; --line:#e6e9f2;
+  --primary:#4f46e5; --primary-2:#7c3aed;
+  --good:#059669; --good-bg:#d1fae5; --bad:#e11d48; --bad-bg:#ffe4e6;
+  --warn:#b45309; --warn-bg:#fef3c7;
+  --shadow:0 10px 30px rgba(15,23,42,.08);
+  --radius:20px; --radius-sm:14px;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+html.dark{
+  --bg1:#0b1220; --bg2:#070b14; --surface:#111a2e; --surface-2:#16203a;
+  --text:#e8edff; --muted:#9aa6bd; --line:rgba(148,163,184,.18);
+  --primary:#818cf8; --primary-2:#c084fc;
+  --good:#34d399; --good-bg:rgba(52,211,153,.14); --bad:#fb7185; --bad-bg:rgba(251,113,133,.14);
+  --warn:#fbbf24; --warn-bg:rgba(251,191,36,.14);
+  --shadow:0 10px 30px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;max-width:100%;overflow-x:hidden}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,system-ui,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(120% 60% at 0% 0%, rgba(79,70,229,.18), transparent 60%),
+    radial-gradient(120% 60% at 100% 0%, rgba(124,58,237,.14), transparent 60%),
+    linear-gradient(180deg,var(--bg1),var(--bg2));
+  min-height:100vh;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+h1,h2,h3,p{margin:0}
+
+/* App bar */
+.appbar{
+  position:sticky;top:0;z-index:30;
+  padding:calc(var(--safe-top) + 10px) 16px 10px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  background:linear-gradient(180deg, color-mix(in srgb, var(--bg1) 92%, transparent), transparent);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.logo{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;color:#fff;
+  background:linear-gradient(145deg,var(--primary),var(--primary-2));box-shadow:var(--shadow);flex:none}
+.logo svg{width:22px;height:22px}
+.brand .t1{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--primary)}
+.brand .t2{font-size:17px;font-weight:800;letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.icon-btn{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;flex:none;
+  background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow)}
+.icon-btn svg{width:20px;height:20px}
+
+/* Screen container */
+.screen{width:100%;max-width:640px;margin:0 auto;padding:6px 16px 120px}
+.screen{display:none}
+.screen.active{display:block}
+
+.eyebrow{font-size:11px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--primary);margin-bottom:6px}
+.section-title{font-size:22px;font-weight:800;letter-spacing:-.03em;margin-bottom:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px}
+.card + .card{margin-top:12px}
+
+/* Hero */
+.hero{border:0;color:#fff;background:linear-gradient(140deg,var(--primary),var(--primary-2));position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;width:220px;height:220px;border-radius:50%;right:-70px;top:-90px;background:rgba(255,255,255,.14)}
+.hero .lbl{font-size:13px;font-weight:700;opacity:.92;position:relative}
+.hero .big{font-size:40px;font-weight:800;letter-spacing:-.03em;margin-top:4px;position:relative}
+.hero .sub{font-size:13px;opacity:.9;margin-top:8px;position:relative;line-height:1.5}
+
+/* Metric grid */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.metric{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-sm);box-shadow:var(--shadow);padding:14px}
+.metric .k{font-size:12px;color:var(--muted);font-weight:700}
+.metric .v{font-size:22px;font-weight:800;letter-spacing:-.02em;margin-top:4px}
+.metric .h{font-size:11px;color:var(--muted);margin-top:3px}
+.metric.win{background:var(--good-bg)}
+.v.good{color:var(--good)} .v.bad{color:var(--bad)}
+
+/* Decision */
+.decision .headline{font-size:20px;font-weight:800;letter-spacing:-.02em}
+.decision p{color:var(--muted);font-size:14px;line-height:1.6;margin-top:8px}
+
+/* base picker chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.chip{padding:9px 14px;border-radius:999px;font-weight:700;font-size:14px;border:1px solid var(--line);background:var(--surface-2);color:var(--text)}
+.chip.sel{background:linear-gradient(145deg,var(--primary),var(--primary-2));color:#fff;border-color:transparent}
+
+/* Scenario rows */
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface)}
+.row + .row{margin-top:10px}
+.row .base{font-size:18px;font-weight:800}
+.row .tot{font-size:12px;color:var(--muted);margin-top:2px}
+.row .delta{font-size:16px;font-weight:800;text-align:right}
+.badge{display:inline-block;margin-top:4px;font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px}
+.badge.win{color:var(--good);background:var(--good-bg)}
+.badge.lose{color:var(--bad);background:var(--bad-bg)}
+.badge.even{color:var(--warn);background:var(--warn-bg)}
+
+/* vests */
+.vest{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface);padding:12px}
+.vest + .vest{margin-top:10px}
+.vest .top{display:flex;gap:10px}
+.vest .top .field{flex:1}
+.vest .meta{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.vest .meta .net{font-weight:800;color:var(--primary)}
+.link-btn{color:var(--bad);font-weight:700;font-size:13px}
+
+/* fields */
+.field{margin-top:12px}
+.field:first-child{margin-top:0}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.field input, .field select{
+  width:100%;min-height:48px;padding:0 14px;border-radius:12px;border:1px solid var(--line);
+  background:var(--surface-2);color:var(--text);font-size:16px;font-weight:600;
+}
+.field input:focus, .field select:focus{outline:2px solid var(--primary);border-color:transparent}
+.two{display:flex;gap:10px}.two .field{flex:1}
+.hint{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* buttons */
+.btn{min-height:48px;padding:0 18px;border-radius:999px;font-weight:800;font-size:15px;display:inline-grid;place-items:center;
+  background:linear-gradient(145deg,var(--primary),var(--primary-2));color:#fff;box-shadow:var(--shadow)}
+.btn.sec{background:var(--surface);color:var(--text);border:1px solid var(--line);box-shadow:none}
+.btn.block{width:100%}
+.btn-row{display:flex;gap:10px;margin-top:14px}
+.btn-row .btn{flex:1}
+
+/* bottom tabbar */
+.tabbar{
+  position:fixed;left:0;right:0;bottom:0;z-index:40;
+  display:flex;justify-content:space-around;align-items:center;gap:4px;
+  padding:8px 8px calc(var(--safe-bottom) + 8px);
+  background:color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-top:1px solid var(--line);
+}
+.tab{flex:1;display:grid;justify-items:center;gap:3px;padding:6px 2px;border-radius:14px;color:var(--muted);font-size:11px;font-weight:700}
+.tab svg{width:22px;height:22px}
+.tab.active{color:var(--primary)}
+.tab.active .pill{background:color-mix(in srgb,var(--primary) 14%, transparent)}
+.pill{padding:3px 14px;border-radius:999px;display:grid;place-items:center}
+
+/* toast */
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--safe-bottom) + 84px);
+  background:#0f172a;color:#fff;padding:11px 18px;border-radius:999px;font-weight:700;font-size:14px;
+  box-shadow:0 10px 30px rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;z-index:60}
+html.dark .toast{background:#e8edff;color:#0b1220}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-6px)}
+.foot{color:var(--muted);font-size:12px;text-align:center;margin-top:18px;line-height:1.6}
+</style>
+</head>
+<body>
+  <header class="appbar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 7h11M4 7l3-3M4 7l3 3M20 17H9M20 17l-3-3M20 17l-3 3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div style="min-width:0">
+        <div class="t1">Salary switch</div>
+        <div class="t2">SwitchLab</div>
+      </div>
+    </div>
+    <button class="icon-btn" id="themeBtn" aria-label="Toggle theme">
+      <svg viewBox="0 0 24 24" fill="none"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+    </button>
+  </header>
+
+  <main>
+    <section class="screen active" id="screen-dash"></section>
+    <section class="screen" id="screen-scen"></section>
+    <section class="screen" id="screen-equity"></section>
+    <section class="screen" id="screen-inputs"></section>
+  </main>
+
+  <nav class="tabbar" id="tabbar">
+    <button class="tab active" data-tab="dash"><span class="pill"><svg viewBox="0 0 24 24" fill="none"><path d="M4 13h6V4H4v9zm10 7h6v-9h-6v9zM4 20h6v-4H4v4zM14 4v4h6V4h-6z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></span>Dashboard</button>
+    <button class="tab" data-tab="scen"><span class="pill"><svg viewBox="0 0 24 24" fill="none"><path d="M4 19V5M4 19h16M8 16v-5M12 16V8M16 16v-3M20 16v-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>Scenarios</button>
+    <button class="tab" data-tab="equity"><span class="pill"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 4v6c0 4-3 6-7 8-4-2-7-4-7-8V7l7-4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></span>Equity</button>
+    <button class="tab" data-tab="inputs"><span class="pill"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>Inputs</button>
+  </nav>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+(function(){
+  var STORE="switchlab-state-v2", THEME="switchlab-theme";
+  var DAY=86400000;
+
+  var DEFAULTS={
+    timeline:{startDate:"2025-10-20",switchDate:"2026-11-01",endDate:"2029-11-01"},
+    current:{name:"Amazon",base:110000,takeHome:76,signOn1:18200,signOn1RepayMonths:12,
+      signOn2:13500,secondBonusStart:"2026-10-20",secondBonusEnd:"2027-10-20",
+      relocationNet:7000,relocationRepayOnSwitch:3500,rsuShares:170,rsuPrice:241.70,rsuTakeHome:76},
+    newCompany:{name:"Cap One",takeHome:70,relocationNet:0,scenarios:"120000, 125000, 130000, 135000, 140000, 145000, 150000"},
+    ui:{selectedBase:140000},
+    rsuVests:[{date:"2026-10-15",percent:5},{date:"2027-10-15",percent:15},
+      {date:"2028-04-15",percent:20},{date:"2028-10-15",percent:20},
+      {date:"2029-04-15",percent:20},{date:"2029-10-15",percent:20}]
+  };
+
+  var state=load(), active="dash";
+
+  function clone(o){return JSON.parse(JSON.stringify(o));}
+  function merge(t,s){ if(!s||typeof s!=="object")return t;
+    for(var k in s){ if(Array.isArray(s[k]))t[k]=s[k];
+      else if(s[k]&&typeof s[k]==="object")t[k]=merge(t[k]||{},s[k]); else t[k]=s[k]; } return t; }
+  function load(){ try{var r=localStorage.getItem(STORE); return r?merge(clone(DEFAULTS),JSON.parse(r)):clone(DEFAULTS);}catch(e){return clone(DEFAULTS);} }
+  function save(){ try{localStorage.setItem(STORE,JSON.stringify(state));}catch(e){} }
+
+  function num(v){var n=Number(v);return isFinite(n)?n:0;}
+  function pct(v){return num(v)/100;}
+  function pd(v){ if(!v)return null; var p=String(v).split("-").map(Number); if(!p[0]||!p[1]||!p[2])return null; return Date.UTC(p[0],p[1]-1,p[2]); }
+  function daysBetween(a,b){var x=(typeof a==="number")?a:pd(a),y=(typeof b==="number")?b:pd(b); if(x==null||y==null)return 0; return Math.max(0,Math.round((y-x)/DAY));}
+  function years(a,b){return daysBetween(a,b)/365;}
+  function addMonths(v,m){var t=pd(v); if(t==null)return null; var d=new Date(t); var day=d.getUTCDate();
+    var o=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+num(m),1));
+    var max=new Date(Date.UTC(o.getUTCFullYear(),o.getUTCMonth()+1,0)).getUTCDate();
+    o.setUTCDate(Math.min(day,max)); return o.getTime();}
+  function overlap(a1,a2,b1,b2){var x1=pd(a1),x2=pd(a2),y1=pd(b1),y2=pd(b2); if(x1==null||x2==null||y1==null||y2==null)return 0;
+    return daysBetween(Math.max(x1,y1),Math.min(x2,y2));}
+  function leq(a,b){var x=pd(a),y=(typeof b==="number")?b:pd(b); return x!=null&&y!=null&&x<=y;}
+
+  function salaryNet(base,s,e,rate){return num(base)*rate*years(s,e);}
+  function so1Repay(gross,start,leave,months){ months=num(months); if(months<=0)return 0;
+    var end=addMonths(start,months); if(end==null)return 0; var lv=pd(leave);
+    if(lv!=null&&end<=lv)return 0; var total=daysBetween(start,end); if(total<=0)return 0;
+    var unearned=daysBetween(leave,end); return num(gross)*(unearned/total); }
+  function bonusNet(gross,ps,pe,es,ee,rate){var pdays=daysBetween(ps,pe); if(pdays<=0)return 0;
+    return num(gross)*(overlap(ps,pe,es,ee)/pdays)*rate;}
+  function rsuUntil(cutoff,s){var sh=num(s.current.rsuShares),pr=num(s.current.rsuPrice),th=pct(s.current.rsuTakeHome);
+    var net=0,gross=0,inc=[]; (s.rsuVests||[]).forEach(function(v){ if(leq(v.date,cutoff)){
+      var shares=sh*num(v.percent)/100, g=shares*pr, n=g*th; net+=n;gross+=g; inc.push({date:v.date,percent:num(v.percent),shares:shares,gross:g,net:n});}});
+    return {net:net,gross:gross,inc:inc};}
+  function parseScen(v){return String(v||"").split(/[\n,]+/).map(function(x){return Number(String(x).replace(/[^0-9.]/g,""));})
+    .filter(function(x){return isFinite(x)&&x>0;}).sort(function(a,b){return a-b;});}
+
+  function calc(s){
+    var st=s.timeline.startDate, sw=s.timeline.switchDate, en=s.timeline.endDate;
+    var cth=pct(s.current.takeHome), nth=pct(s.newCompany.takeHome);
+    var staySal=salaryNet(s.current.base,st,en,cth);
+    var staySO1=num(s.current.signOn1)*cth;
+    var staySO2=bonusNet(s.current.signOn2,s.current.secondBonusStart,s.current.secondBonusEnd,st,en,cth);
+    var stayRsu=rsuUntil(en,s);
+    var stayReloc=num(s.current.relocationNet);
+    var stayTotal=staySal+staySO1+staySO2+stayRsu.net+stayReloc;
+
+    var preSal=salaryNet(s.current.base,st,sw,cth);
+    var repay=so1Repay(s.current.signOn1,st,sw,s.current.signOn1RepayMonths);
+    var preSO1=staySO1-repay;
+    var preSO2=bonusNet(s.current.signOn2,s.current.secondBonusStart,s.current.secondBonusEnd,st,sw,cth);
+    var preRsu=rsuUntil(sw,s);
+    var preReloc=num(s.current.relocationNet)-num(s.current.relocationRepayOnSwitch);
+    var preTotal=preSal+preSO1+preSO2+preRsu.net+preReloc;
+
+    var newReloc=num(s.newCompany.relocationNet);
+    var bases=parseScen(s.newCompany.scenarios), sel=num(s.ui.selectedBase);
+    if(bases.indexOf(sel)<0){bases.push(sel);bases.sort(function(a,b){return a-b;});}
+    var scenY=years(sw,en);
+    var scenarios=bases.map(function(b){var ns=salaryNet(b,sw,en,nth);var t=preTotal+ns+newReloc;var d=t-stayTotal;return {base:b,total:t,delta:d,wins:d>=0};});
+    var selNs=salaryNet(sel,sw,en,nth), selTotal=preTotal+selNs+newReloc, selDelta=selTotal-stayTotal;
+    var be=(scenY>0&&nth>0)?(stayTotal-preTotal-newReloc)/(nth*scenY):0;
+    var best=scenarios.reduce(function(a,b){return !a||b.delta>a.delta?b:a;},null);
+    return {stayTotal:stayTotal,preTotal:preTotal,scenarios:scenarios,breakEven:be,best:best,
+      selected:{base:sel,total:selTotal,delta:selDelta,wins:selDelta>=0},
+      stayRsu:stayRsu,preRsu:preRsu,cth:cth,nth:nth,start:st,switchDate:sw,end:en};
+  }
+
+  var fmt0=new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0});
+  function money(v){return fmt0.format(num(v));}
+  function signed(v){var m=money(Math.abs(v));return (v>=0?"+":"−")+m;}
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+
+  /* ---------- renders ---------- */
+  function renderDash(){
+    var r=calc(state);
+    var deltaClass=r.selected.delta>=0?"good":"bad";
+    var head = r.selected.delta>5000?"Switching wins financially."
+             : Math.abs(r.selected.delta)<=5000?"It's basically break-even."
+             : "Staying wins financially.";
+    var chips=r.scenarios.map(function(sc){
+      var sel=sc.base===r.selected.base;
+      return '<button class="chip'+(sel?' sel':'')+'" data-base="'+sc.base+'">'+ (sc.base/1000)+'k</button>';
+    }).join("");
+    document.getElementById("screen-dash").innerHTML =
+      '<div class="eyebrow">Private · Local · Offline</div>'+
+      '<div class="section-title">Know the base that makes switching worth it.</div>'+
+      '<div class="card hero"><div class="lbl">Break-even new base</div>'+
+        '<div class="big">'+money(r.breakEven)+'</div>'+
+        '<div class="sub">'+esc(state.current.name)+' → '+esc(state.newCompany.name)+' through '+r.end+'. Any offer at or above this beats staying.</div></div>'+
+      '<div class="grid">'+
+        '<div class="metric"><div class="k">Stay total</div><div class="v">'+money(r.stayTotal)+'</div><div class="h">'+esc(state.current.name)+' through '+r.end+'</div></div>'+
+        '<div class="metric'+(r.selected.wins?' win':'')+'"><div class="k">Switch @ '+(r.selected.base/1000)+'k</div><div class="v">'+money(r.selected.total)+'</div><div class="h">'+esc(state.newCompany.name)+'</div></div>'+
+        '<div class="metric"><div class="k">Delta vs stay</div><div class="v '+deltaClass+'">'+signed(r.selected.delta)+'</div><div class="h">'+(r.selected.delta>=0?"switch ahead":"stay ahead")+'</div></div>'+
+        '<div class="metric"><div class="k">Best scenario</div><div class="v good">'+signed(r.best?r.best.delta:0)+'</div><div class="h">at '+money(r.best?r.best.base:0)+' base</div></div>'+
+      '</div>'+
+      '<div class="card decision" style="margin-top:12px"><div class="eyebrow">Decision</div>'+
+        '<div class="headline">'+head+'</div>'+
+        '<p>At '+money(r.selected.base)+' base, the switch path ends at '+money(r.selected.total)+', which is '+signed(r.selected.delta)+' versus staying. Break-even is '+money(r.breakEven)+'.</p>'+
+        '<div class="eyebrow" style="margin-top:14px">Pick a new base</div>'+
+        '<div class="chips">'+chips+'</div></div>'+
+      '<div class="foot">Estimator only — not tax, legal, immigration, or financial advice.</div>';
+  }
+
+  function renderScen(){
+    var r=calc(state);
+    var rows=r.scenarios.map(function(sc){
+      var badge = Math.abs(sc.delta)<=5000?'<span class="badge even">Break-even</span>'
+                : sc.wins?'<span class="badge win">Switch wins</span>':'<span class="badge lose">Stay wins</span>';
+      return '<div class="row"><div><div class="base">'+money(sc.base)+'</div><div class="tot">Total '+money(sc.total)+'</div>'+badge+'</div>'+
+        '<div class="delta '+(sc.delta>=0?'':'')+'" style="color:'+(sc.delta>=0?'var(--good)':'var(--bad)')+'">'+signed(sc.delta)+'</div></div>';
+    }).join("");
+    document.getElementById("screen-scen").innerHTML =
+      '<div class="eyebrow">What-if ladder</div>'+
+      '<div class="section-title">Salary scenarios</div>'+
+      '<div class="card"><p style="color:var(--muted);font-size:14px;margin-bottom:12px">Green means switching nets the same or more than staying, after tax, bonuses, RSUs and relocation repayment.</p>'+rows+'</div>'+
+      '<div class="btn-row"><button class="btn sec" id="copyCsv">Copy as CSV</button><button class="btn" id="shareRep">Share report</button></div>';
+  }
+
+  function renderEquity(){
+    var r=calc(state);
+    var total=(state.rsuVests||[]).reduce(function(a,v){return a+num(v.percent);},0);
+    var sh=num(state.current.rsuShares), pr=num(state.current.rsuPrice), th=pct(state.current.rsuTakeHome);
+    var vests=(state.rsuVests||[]).map(function(v,i){
+      var shares=sh*num(v.percent)/100, net=shares*pr*th;
+      return '<div class="vest"><div class="top">'+
+        '<div class="field"><label>Vest date</label><input type="date" data-vest="'+i+'" data-key="date" value="'+esc(v.date)+'"></div>'+
+        '<div class="field" style="max-width:120px"><label>Percent</label><input inputmode="decimal" data-vest="'+i+'" data-key="percent" value="'+esc(v.percent)+'"></div>'+
+        '</div><div class="meta"><div style="color:var(--muted);font-size:13px">'+ (Math.round(shares*10)/10) +' shares · <span class="net">'+money(net)+'</span> net</div>'+
+        '<button class="link-btn" data-remove="'+i+'">Remove</button></div></div>';
+    }).join("");
+    document.getElementById("screen-equity").innerHTML =
+      '<div class="eyebrow">Equity schedule</div>'+
+      '<div class="section-title">RSU vesting editor</div>'+
+      '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'+
+        '<div><div style="font-weight:800">'+esc(state.current.name)+' vests</div>'+
+        '<div style="color:var(--muted);font-size:13px">'+sh+' shares @ '+money(pr)+'</div></div>'+
+        '<span class="badge '+(Math.abs(total-100)<0.001?'win':'even')+'">'+ (Math.round(total*10)/10) +'% total</span></div>'+
+        vests+
+        '<button class="btn block sec" id="addVest" style="margin-top:12px">+ Add vest</button></div>'+
+      '<div class="card"><div class="k" style="color:var(--muted);font-size:12px;font-weight:700">Included if you stay</div>'+
+        '<div style="font-size:22px;font-weight:800;margin-top:4px">'+money(r.stayRsu.net)+' net</div>'+
+        '<div class="hint">Before switch: '+money(r.preRsu.net)+' net</div></div>';
+  }
+
+  function fieldText(label,path,opts){opts=opts||{};
+    return '<div class="field"><label>'+esc(label)+'</label><input '+(opts.type?('type="'+opts.type+'"'):'inputmode="'+(opts.mode||"text")+'"')+' data-path="'+path+'" value="'+esc(get(path))+'">'+(opts.hint?'<div class="hint">'+esc(opts.hint)+'</div>':'')+'</div>';}
+  function get(p){return p.split(".").reduce(function(a,k){return a==null?undefined:a[k];},state);}
+  function set(p,v){var parts=p.split("."),last=parts.pop();var t=parts.reduce(function(a,k){if(!a[k])a[k]={};return a[k];},state);t[last]=v;}
+
+  function renderInputs(){
+    document.getElementById("screen-inputs").innerHTML =
+      '<div class="eyebrow">Setup</div><div class="section-title">Inputs</div>'+
+      '<div class="card"><div class="eyebrow">Timeline</div>'+
+        fieldText("Join / start date","timeline.startDate",{type:"date"})+
+        fieldText("Switch date","timeline.switchDate",{type:"date"})+
+        fieldText("Analysis end date","timeline.endDate",{type:"date"})+'</div>'+
+      '<div class="card"><div class="eyebrow">Current company</div>'+
+        fieldText("Name","current.name",{})+
+        '<div class="two">'+fieldText("Base salary","current.base",{mode:"decimal"})+fieldText("Take-home %","current.takeHome",{mode:"decimal"})+'</div>'+
+        '<div class="two">'+fieldText("First sign-on (gross)","current.signOn1",{mode:"decimal"})+fieldText("Repay window (months)","current.signOn1RepayMonths",{mode:"numeric"})+'</div>'+
+        fieldText("Second-year sign-on (gross)","current.signOn2",{mode:"decimal"})+
+        '<div class="two">'+fieldText("2nd bonus start","current.secondBonusStart",{type:"date"})+fieldText("2nd bonus end","current.secondBonusEnd",{type:"date"})+'</div>'+
+        '<div class="two">'+fieldText("Relocation received (net)","current.relocationNet",{mode:"decimal"})+fieldText("Relo repay on switch (net)","current.relocationRepayOnSwitch",{mode:"decimal"})+'</div>'+
+        '<div class="two">'+fieldText("RSU shares","current.rsuShares",{mode:"decimal"})+fieldText("RSU price","current.rsuPrice",{mode:"decimal"})+'</div>'+
+        fieldText("RSU take-home %","current.rsuTakeHome",{mode:"decimal"})+'</div>'+
+      '<div class="card"><div class="eyebrow">New company</div>'+
+        fieldText("Name","newCompany.name",{})+
+        '<div class="two">'+fieldText("Take-home %","newCompany.takeHome",{mode:"decimal"})+fieldText("Relocation (net)","newCompany.relocationNet",{mode:"decimal"})+'</div>'+
+        fieldText("Selected base for dashboard","ui.selectedBase",{mode:"decimal"})+
+        fieldText("Scenario bases (comma-separated)","newCompany.scenarios",{hint:"e.g. 120000, 130000, 140000"})+'</div>'+
+      '<div class="btn-row"><button class="btn sec" id="resetBtn">Reset to default</button><button class="btn" id="saveBtn">Save</button></div>'+
+      '<div class="foot">Everything is stored only on this device.</div>';
+  }
+
+  function renderActive(){
+    if(active==="dash")renderDash();
+    else if(active==="scen")renderScen();
+    else if(active==="equity")renderEquity();
+    else renderInputs();
+  }
+
+  /* ---------- interactions ---------- */
+  var toastT;
+  function toast(msg){var t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(function(){t.classList.remove("show");},1800);}
+
+  function switchTab(name){
+    active=name; save();
+    [].forEach.call(document.querySelectorAll(".screen"),function(s){s.classList.remove("active");});
+    document.getElementById("screen-"+name).classList.add("active");
+    [].forEach.call(document.querySelectorAll(".tab"),function(b){b.classList.toggle("active",b.getAttribute("data-tab")===name);});
+    renderActive();
+    window.scrollTo(0,0);
+  }
+  document.getElementById("tabbar").addEventListener("click",function(e){
+    var b=e.target.closest(".tab"); if(b)switchTab(b.getAttribute("data-tab"));
+  });
+
+  document.body.addEventListener("click",function(e){
+    var chip=e.target.closest(".chip");
+    if(chip){state.ui.selectedBase=Number(chip.getAttribute("data-base"));save();renderDash();return;}
+    if(e.target.id==="addVest"){state.rsuVests.push({date:state.timeline.endDate,percent:0});save();renderEquity();return;}
+    var rm=e.target.closest("[data-remove]");
+    if(rm){state.rsuVests.splice(Number(rm.getAttribute("data-remove")),1);save();renderEquity();return;}
+    if(e.target.id==="saveBtn"){save();toast("Saved on device");return;}
+    if(e.target.id==="resetBtn"){state=clone(DEFAULTS);save();renderInputs();toast("Reset to default");return;}
+    if(e.target.id==="copyCsv"){copyCsv();return;}
+    if(e.target.id==="shareRep"){shareReport();return;}
+  });
+
+  // live-edit inputs (no re-render of the field being typed in)
+  document.body.addEventListener("input",function(e){
+    var el=e.target;
+    if(el.hasAttribute("data-path")){
+      var p=el.getAttribute("data-path");
+      var isNum=["base","takeHome","signOn1","signOn1RepayMonths","signOn2","relocationNet","relocationRepayOnSwitch","rsuShares","rsuPrice","rsuTakeHome","selectedBase"].some(function(k){return p.indexOf(k)>=0;});
+      set(p, isNum? num(el.value) : el.value);
+      save();
+    } else if(el.hasAttribute("data-vest")){
+      var i=Number(el.getAttribute("data-vest")), key=el.getAttribute("data-key");
+      state.rsuVests[i][key]= key==="percent"? num(el.value) : el.value;
+      save();
+      // live-update just this vest's computed net
+      var vestEl=el.closest(".vest"); if(vestEl){var sh=num(state.current.rsuShares),pr=num(state.current.rsuPrice),th=pct(state.current.rsuTakeHome);
+        var shares=sh*num(state.rsuVests[i].percent)/100; var netEl=vestEl.querySelector(".net"); if(netEl)netEl.textContent=money(shares*pr*th);}
+    }
+  });
+
+  function reportText(){
+    var r=calc(state);
+    var lines=["SwitchLab report",
+      "Stay total: "+money(r.stayTotal),
+      "Switch @ "+money(r.selected.base)+" base: "+money(r.selected.total),
+      "Delta: "+signed(r.selected.delta),
+      "Break-even base: "+money(r.breakEven),"","Scenarios:"];
+    r.scenarios.forEach(function(sc){lines.push(money(sc.base)+" -> "+money(sc.total)+" ("+signed(sc.delta)+(sc.wins?", switch wins":", stay wins")+")");});
+    return lines.join("\n");
+  }
+  function csvText(){
+    var r=calc(state), out=["Base,Switch total,Delta vs stay,Decision"];
+    r.scenarios.forEach(function(sc){out.push([sc.base,Math.round(sc.total),Math.round(sc.delta),sc.wins?"Switch wins":"Stay wins"].join(","));});
+    out.push("Stay total,"+Math.round(r.stayTotal)); out.push("Break-even base,"+Math.round(r.breakEven));
+    return out.join("\n");
+  }
+  function copyText(txt,okMsg){
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(function(){toast(okMsg);},function(){legacyCopy(txt,okMsg);});}
+    else legacyCopy(txt,okMsg);
+  }
+  function legacyCopy(txt,okMsg){var ta=document.createElement("textarea");ta.value=txt;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");toast(okMsg);}catch(e){toast("Copy not supported");}document.body.removeChild(ta);}
+  function copyCsv(){copyText(csvText(),"CSV copied — paste into Sheets");}
+  function shareReport(){var t=reportText();
+    if(navigator.share){navigator.share({title:"SwitchLab report",text:t}).catch(function(){copyText(t,"Report copied");});}
+    else copyText(t,"Report copied");}
+
+  // theme
+  function applyTheme(dark){document.documentElement.classList.toggle("dark",dark);try{localStorage.setItem(THEME,dark?"dark":"light");}catch(e){}
+    var m=document.querySelector('meta[name=theme-color]'); if(m)m.setAttribute("content",dark?"#0b1220":"#4f46e5");}
+  (function(){var saved;try{saved=localStorage.getItem(THEME);}catch(e){} applyTheme(saved?saved==="dark":false);})();
+  document.getElementById("themeBtn").addEventListener("click",function(){applyTheme(!document.documentElement.classList.contains("dark"));});
+
+  renderActive();
+})();
+</script>
+</body>
+</html>
