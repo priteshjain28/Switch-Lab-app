@@ -1,0 +1,97 @@
+name: Build SwitchLab APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Rebuild Android project structure from flat files
+        run: |
+          set -e
+          echo "::group::Reconstructing project structure"
+          mkdir -p app/src/main/java/com/offerverse/switchlab/model
+          mkdir -p app/src/test/java/com/offerverse/switchlab
+          mkdir -p app/src/main/res/xml
+          mkdir -p app/src/main/res/values
+          mkdir -p app/src/main/res/drawable
+          mkdir -p app/src/main/res/mipmap-anydpi-v26
+
+          move() { if [ -f "$1" ]; then mv -f "$1" "$2"; echo "  moved $1 -> $2"; fi; }
+
+          move MainActivity.kt         app/src/main/java/com/offerverse/switchlab/
+          move CalculatorEngine.kt     app/src/main/java/com/offerverse/switchlab/model/
+          move CalculatorEngineTest.kt app/src/test/java/com/offerverse/switchlab/
+          move AndroidManifest.xml         app/src/main/
+          move backup_rules.xml            app/src/main/res/xml/
+          move data_extraction_rules.xml   app/src/main/res/xml/
+          move styles.xml              app/src/main/res/values/
+          move strings.xml             app/src/main/res/values/
+          move ic_launcher_background.xml  app/src/main/res/drawable/
+          move ic_launcher_foreground.xml  app/src/main/res/drawable/
+          move ic_launcher.xml         app/src/main/res/mipmap-anydpi-v26/
+          move ic_launcher_round.xml   app/src/main/res/mipmap-anydpi-v26/
+          move proguard-rules.pro      app/
+
+          appg=""; rootg=""
+          for f in "build.gradle.kts" "build.gradle (1).kts"; do
+            [ -f "$f" ] || continue
+            if grep -q "namespace" "$f"; then appg="$f"; else rootg="$f"; fi
+          done
+          [ -n "$appg" ] && mv -f "$appg" app/build.gradle.kts && echo "  app build: $appg"
+          if [ -n "$rootg" ] && [ "$rootg" != "build.gradle.kts" ]; then mv -f "$rootg" build.gradle.kts; fi
+          echo "::endgroup::"
+
+          echo "::group::Final tree"
+          find . -path ./.git -prune -o -type f -print | sort
+          echo "::endgroup::"
+
+          if [ ! -f gradle.properties ]; then
+            printf 'android.useAndroidX=true\norg.gradle.jvmargs=-Xmx2048m\n' > gradle.properties
+            echo "created gradle.properties"
+          fi
+
+          missing=0
+          for req in settings.gradle.kts build.gradle.kts app/build.gradle.kts \
+                     app/src/main/AndroidManifest.xml \
+                     app/src/main/java/com/offerverse/switchlab/MainActivity.kt; do
+            [ -f "$req" ] || { echo "MISSING: $req"; missing=1; }
+          done
+          [ "$missing" = "1" ] && { echo "A required file was not uploaded to the repo."; exit 1; } || true
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      - name: Build debug APK
+        run: gradle assembleDebug --no-daemon --stacktrace
+
+      - name: Rename APK
+        run: cp app/build/outputs/apk/debug/app-debug.apk SwitchLab.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SwitchLab-debug-apk
+          path: SwitchLab.apk
+          if-no-files-found: error
+
+      - name: Run unit tests
+        continue-on-error: true
+        run: gradle testDebugUnitTest --no-daemon --stacktrace
